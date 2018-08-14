@@ -6,7 +6,11 @@ import Items from "./Items";
 
 import "./Application.css";
 
-const defaultState = [
+
+
+class Application extends Component {
+  state = {
+    items: [
   { value: "Pants", id: uniqueId(), packed: false },
   { value: "Jacket", id: uniqueId(), packed: false },
   { value: "iPhone Charger", id: uniqueId(), packed: false },
@@ -18,25 +22,42 @@ const defaultState = [
   { value: "Belt", id: uniqueId(), packed: false },
   { value: "Passport", id: uniqueId(), packed: true },
   { value: "Sandwich", id: uniqueId(), packed: true }
-];
-
-class Application extends Component {
-  state = {
-    items: defaultState
+]
   };
-
+ 
   addItem = item => {
     this.setState({
       items: [item, ...this.state.items]
     });
   };
 
+  toggleItem = (itemToToggle) => {
+     const items = this.state.items.map(item => {
+       if (item.id !== itemToToggle ) return item;
+       return {...itemToToggle, packed: !itemToToggle.packed}
+     })
+     this.setState({
+       items
+     })
+  }
   removeItem = itemToRemove => {
     this.setState({
       items: this.state.items.filter(item => item.id !== itemToRemove.id)
     });
   };
+
+  markAllAsUnpacked = () => {
+         const items = this.state.items.map(item => {
+       return {...item, packed: false}
+     })
+     this.setState({
+       items
+     })
+  }
+  
+  
   render() {
+    console.log(this.props.unpackedItems)
     const { items } = this.state;
     const packedItems = items.filter(item => item.packed);
     const unpackedItems = items.filter(item => !item.packed);
@@ -44,8 +65,8 @@ class Application extends Component {
       <div className="Application">
         <NewItem onSubmit={this.addItem} />
         <CountDown />
-        <Items title="Unpacked Items" items={[unpackedItems]} onRemove={this.removeItem} />
-        <Items title="Packed Items" items={[packedItems]} onRemove={this.removeItem} />
+        <Items title="Unpacked Items" items={[unpackedItems]} onRemove={this.removeItem} onToggle={this.toggleItem} onClick={this.markAllAsUnpacked}/>
+        <Items title="Packed Items" items={[packedItems]} onRemove={this.removeItem} onToggle={this.toggleItem} />
         <button className="button full-width">Mark All As Unpacked</button>
       </div>
     );
